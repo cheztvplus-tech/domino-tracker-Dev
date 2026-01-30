@@ -107,6 +107,24 @@ select {
   width: 56px;
 }
 
+/* ===== DOMINO BOARD ===== */
+
+#domino-board {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 10px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 10px;
+  min-height: 80px;
+}
+
+.board-domino {
+  height: 60px;
+  transform: rotate(-90deg);
+}
+
 /* ===== PLAYED SECTION ===== */
 #played-section {
   display: flex;
@@ -211,6 +229,7 @@ select {
     width: 100%;
   }
 }
+
 
 
 
