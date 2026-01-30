@@ -9,6 +9,8 @@ let passes = { RP:new Set(), MP:new Set(), LP:new Set() };
 const playerRotation = ["RP","MP","LP"];
 let currentRotationIndex = 0;
 let handIsSet = false;
+
+// 🔥 NEW: Domino board chain
 let boardChain = [];
 
 // ======= Elements =======
@@ -31,6 +33,9 @@ const bgSelect = document.getElementById("bg-theme");
 const dominoSelect = document.getElementById("domino-theme");
 const clearHandBtn = document.getElementById('clear-hand-btn');
 
+// ===== Board element =====
+const boardDiv = document.getElementById("domino-board");
+
 // Keep rotation synced
 playerSelect.addEventListener("change", syncRotationWithSelect);
 
@@ -49,6 +54,7 @@ fetch("sets.json")
       opt.text = t === "woodbrown" ? "Brown" : t.charAt(0).toUpperCase() + t.slice(1);
       bgSelect.appendChild(opt);
     });
+
     bgSelect.value = defaultBackground;
     applyBackground(defaultBackground);
 
@@ -92,11 +98,13 @@ fetch("sets.json")
 
 // ======= Theme Switching =======
 bgSelect.addEventListener("change", e => applyBackground(e.target.value));
+
 dominoSelect.addEventListener("change", e => {
   currentTileFolder = e.target.value;
   renderMyHandButtons();
   updatePlayedLog();
-  updatePassesLog(); // 🔥 keep pass images synced with theme
+  updatePassesLog();
+  renderBoard();          // 🔥 keep board synced with theme
   if(handIsSet) updatePredictions();
 });
 
@@ -180,6 +188,7 @@ setHandBtn.onclick=()=>{
 clearHandBtn.onclick=()=>{
   myHand=[];
   playedDominoes=[];
+  boardChain=[];          // 🔥 clear board
   passes={ RP:new Set(), MP:new Set(), LP:new Set() };
   handIsSet=false;
 
@@ -193,6 +202,7 @@ clearHandBtn.onclick=()=>{
   lpTilesSpan.innerHTML="";
   playedLogUl.innerHTML="";
   passesLogUl.innerHTML="";
+  boardDiv.innerHTML="";
 };
 
 // ======= My Hand =======
@@ -208,6 +218,7 @@ function renderMyHandButtons(){
 
 function playMyTile(t){
   playedDominoes.push({domino:t,player:"ME"});
+  pushToBoard(t);     // 🔥 add to board
   myHand=myHand.filter(x=>x!==t);
   renderMyHandButtons();
   refreshPlayedDropdown();
@@ -215,17 +226,20 @@ function playMyTile(t){
   updatePlayedLog();
 }
 
-// ======= Rendered Function =======
-function renderBoard() {
-  const board = document.getElementById("domino-board");
-  board.innerHTML = "";
-
-  boardChain.forEach(d => {
-    const img = document.createElement("img");
-    img.src = `dominoes/${d.left}_${d.right}.png`;
-    img.className = "board-domino";
-    board.appendChild(img);
+// ======= Board Renderer =======
+function renderBoard(){
+  boardDiv.innerHTML="";
+  boardChain.forEach(t=>{
+    const img=document.createElement("img");
+    img.src=`${currentTileFolder}/${t.replace("|","-")}.png`;
+    img.className="board-domino";
+    boardDiv.appendChild(img);
   });
+}
+
+function pushToBoard(tile){
+  boardChain.push(tile);
+  renderBoard();
 }
 
 // ======= Played Dropdown =======
@@ -245,14 +259,19 @@ function refreshPlayedDropdown(){
 addPlayBtn.onclick=()=>{
   if(!playedDropdown.value){ alert("Select a tile"); return; }
   syncRotationWithSelect();
-  playedDominoes.push({domino:playedDropdown.value,player:playerSelect.value});
+
+  const tile = playedDropdown.value;
+
+  playedDominoes.push({domino:tile,player:playerSelect.value});
+  pushToBoard(tile);   // 🔥 add to board
+
   refreshPlayedDropdown();
   updatePredictions();
   updatePlayedLog();
   nextTurn();
 };
 
-// ======= PASS (FIXED & THEMED) =======
+// ======= PASS =======
 passBtn.onclick=()=>{
   syncRotationWithSelect();
   const p=playerSelect.value;
@@ -280,7 +299,7 @@ passBtn.onclick=()=>{
   nextTurn();
 };
 
-// ======= Passes Log Renderer =======
+// ======= Passes Log =======
 function updatePassesLog(){
   passesLogUl.innerHTML="";
   const log = JSON.parse(passesLogUl.dataset.log || "[]");
@@ -358,31 +377,27 @@ if("serviceWorker" in navigator){
   navigator.serviceWorker.register("service-worker.js");
 }
 
-// ======= Add to Home Screen / Install =======
+// ======= Install / iOS Hint =======
 let deferredPrompt;
 const installBtn = document.getElementById("install-btn");
 const iosHint = document.getElementById("ios-hint");
 
-// Android: show install button when beforeinstallprompt fires
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display = 'inline-block';
 });
 
-// Install button click
 installBtn.addEventListener('click', async () => {
   if(deferredPrompt){
     deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
+    await deferredPrompt.userChoice;
     deferredPrompt = null;
     installBtn.style.display = 'none';
   }
 });
 
-// iOS detection: show hint if not in standalone mode
 const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
 if(isIos() && !isInStandaloneMode()) iosHint.style.display = 'block';
-
