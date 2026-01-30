@@ -1,232 +1,78 @@
 /* ===== RESET / BASE ===== */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing:border-box; }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   margin: 0;
   padding: 20px;
-  background: #1e1e1e; /* default dark */
-  color: #f5f5f5;      /* default light text for dark bg */
+  background: #1e1e1e;
+  color: #f5f5f5; /* KEEP text visible */
 }
 
 /* ===== HEADERS ===== */
-h1 {
-  text-align: center;
-  margin-bottom: 25px;
-  color: inherit; /* follow body color */
-}
-
-h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-size: 18px;
-  color: inherit;
-}
+h1 { text-align:center; margin-bottom:25px; }
+h2 { margin-top:0; margin-bottom:12px; font-size:18px; }
 
 /* ===== CARD CONTAINER ===== */
 .card {
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 16px 18px;
-  margin-bottom: 20px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  color: inherit;
+  border-radius:12px;
+  padding:16px 18px;
+  margin-bottom:20px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.35);
 }
 
 /* ===== BUTTONS ===== */
 button {
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 14px;
-  background: #3b82f6;
-  color: #fff;
+  cursor:pointer;
+  border:none;
+  border-radius:8px;
+  padding:6px 12px;
+  font-size:14px;
+  background:#3b82f6;
+  color:white;
 }
-
-button:hover {
-  background: #2563eb;
-}
+button:hover { background:#2563eb; }
 
 /* ===== SELECTS ===== */
 select {
-  background: #111;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 6px;
-  padding: 4px 6px;
+  background:#111;
+  color:#fff;
+  border:1px solid #444;
+  border-radius:6px;
+  padding:4px 6px;
 }
 
-/* ===== TOP CONTROLS ===== */
-#theme-selection {
-  display: flex;
-  flex-direction: column; /* each label+dropdown on its own line */
-  gap: 12px; /* spacing between rows */
+/* ===== BOARD ===== */
+#domino-board {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
+  padding:10px;
 }
-
-#theme-selection label {
-  display: inline-block;
-  min-width: 140px;
-  margin-bottom: 4px;
-}
-
-#theme-selection select {
-  display: inline-block;
-  max-width: 150px; /* <-- limits dropdown width */
-}
-
-/* ===== CLEAR HAND ===== */
-#clear-hand-container {
-  margin-top: 10px;
-}
-
-/* ===== HAND SELECTION ===== */
-#hand-dropdowns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 14px;
-}
-
-#hand-dropdowns select {
-  min-width: 100px;
+.board-domino {
+  height:60px;
 }
 
 /* ===== MY HAND ===== */
-#my-hand-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-#my-hand-buttons button {
-  background: none;
-  padding: 0;
-}
-
-#my-hand-buttons img {
-  width: 56px;
-}
-
-/* ===== DOMINO BOARD ===== */
-#domino-board {
-  display: flex;
-  align-items: center;
-  gap: 8px;           /* space between tiles */
-  overflow-x: auto;    /* scroll if long chain */
-  padding: 10px;
-}
-
-.board-domino {
-  height: 60px;
-  transition: transform 0.2s;
-}
-
-/* ===== PLAYED SECTION ===== */
-#played-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 14px;
-  align-items: flex-start;
-}
-
-/* ===== OPPONENT PREDICTIONS ===== */
-#opponent-predictions p {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 6px 0;
-  white-space: nowrap;
-  color: inherit;
-}
-
-#rp-tiles img,
-#mp-tiles img,
-#lp-tiles img {
-  width: 42px;
-}
+#my-hand-buttons { display:flex; flex-wrap:wrap; gap:8px; }
+#my-hand-buttons button { background:none; padding:0; }
+#my-hand-buttons img { width:56px; }
 
 /* ===== LOGS ===== */
-#logs-container {
-  display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
-}
+#played-log, #passes-log { list-style:none; padding:0; margin:0; }
+#played-log li, #passes-log li { display:flex; align-items:center; gap:50px; margin-bottom:6px; white-space:nowrap; }
+#played-log img { height:46px; transform:rotate(-90deg); }
+#passes-log img { width:26px; }
 
-#played-log,
-#passes-log {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#played-log li,
-#passes-log li {
-  display: flex;
-  align-items: center;
-  gap: 50px;
-  margin-bottom: 6px;
-  white-space: nowrap;
-  color: inherit;
-}
-
-/* Played domino rotation in log */
-#played-log img {
-  height: 46px;
-  transform: rotate(-90deg);
-}
-
-/* Passes log */
-#passes-log img {
-  width: 26px;
-}
-
-/* ===== INSTALL BUTTON ===== */
-#install-btn {
-  background: #22c55e;
-  color: #fff;
-}
-
-#install-btn:hover {
-  background: #16a34a;
-}
-
-/* ===== SPACING FIX: Hand Selection Button ===== */
-#hand-selection button#set-hand-btn {
-  margin-top: 8px;
-}
+/* ===== INSTALL ===== */
+#install-btn { background:#22c55e; }
+#install-btn:hover { background:#16a34a; }
 
 /* ===== MOBILE ===== */
-@media (max-width: 768px) {
-  body {
-    padding: 14px;
-  }
-
-  #logs-container {
-    flex-direction: column;
-  }
-
-  #rp-tiles img,
-  #mp-tiles img,
-  #lp-tiles img {
-    width: 54px;
-  }
-
-  #theme-selection {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    row-gap: 12px;
-    column-gap: 12px;
-    align-items: center;
-  }
-
-  #theme-selection label {
-    white-space: nowrap;
-  }
-
-  #theme-selection select {
-    width: 100%;
-  }
+@media(max-width:768px){
+  body{padding:14px;}
+  #logs-container{flex-direction:column;}
+  #rp-tiles img, #mp-tiles img, #lp-tiles img{width:54px;}
 }
