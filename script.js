@@ -55,9 +55,16 @@ fetch("sets.json")
   });
 
   bgSelect.value = defaultBackground;
-  applyBackground(defaultBackground);
 
-  ["tiles-white b","tiles-black","tiles-white","tiles-green","tiles-purple","tiles-red","tiles-neon"].forEach(t=>{
+  [
+    "tiles-white b",
+    "tiles-black",
+    "tiles-white",
+    "tiles-green",
+    "tiles-purple",
+    "tiles-red",
+    "tiles-neon"
+  ].forEach(t=>{
     const opt=document.createElement("option");
     opt.value=t;
     opt.text=t;
@@ -86,7 +93,7 @@ fetch("sets.json")
 });
 
 // ================= THEMES =================
-bgSelect.addEventListener("change",e=>applyBackground(e.target.value));
+bgSelect.addEventListener("change",e=>{});
 dominoSelect.addEventListener("change",e=>{
   currentTileFolder=e.target.value;
   renderMyHandButtons();
@@ -95,10 +102,6 @@ dominoSelect.addEventListener("change",e=>{
   renderBoard();
   if(handIsSet) updatePredictions();
 });
-
-function applyBackground(bg){
-  document.body.style.background = themes[bg];
-}
 
 // ================= HAND SETUP =================
 function initHandDropdowns(){
@@ -153,6 +156,7 @@ function updateHandDropdowns(){
 setHandBtn.onclick=()=>{
   myHand=[];
   const seen=new Set();
+
   for(let i=0;i<7;i++){
     const v=document.getElementById(`hand-select-${i}`).value;
     if(!v){ alert("Select all 7 tiles"); return; }
@@ -163,6 +167,7 @@ setHandBtn.onclick=()=>{
 
   handIsSet=true;
   handSelectionDiv.style.display="none";
+
   renderMyHandButtons();
   refreshPlayedDropdown();
   updatePredictions();
@@ -219,7 +224,14 @@ function renderBoard(){
     const img=document.createElement("img");
     img.src=`${currentTileFolder}/${d.left}-${d.right}.png`;
     img.className="board-domino";
-    if(d.left===d.right) img.classList.add("vertical");
+
+    // Only doubles vertical
+    if(d.left===d.right){
+      img.style.transform="rotate(90deg)";
+    }else{
+      img.style.transform="rotate(0deg)";
+    }
+
     boardDiv.appendChild(img);
   });
 }
@@ -228,6 +240,7 @@ function renderBoard(){
 function refreshPlayedDropdown(){
   const used=new Set([...myHand,...playedDominoes.map(d=>d.domino)]);
   playedDropdown.innerHTML="<option value=''>Select Tile</option>";
+
   allDominoes.forEach(t=>{
     if(!used.has(t)){
       const o=document.createElement("option");
@@ -295,7 +308,9 @@ function updatePredictions(){
   let available=allDominoes.filter(t=>!used.has(t));
 
   const tilesLeft={RP:7,MP:7,LP:7};
-  playedDominoes.forEach(d=>{if(d.player!=="ME") tilesLeft[d.player]--;});
+  playedDominoes.forEach(d=>{
+    if(d.player!=="ME") tilesLeft[d.player]--;
+  });
 
   const pred={RP:[],MP:[],LP:[]};
   ["RP","MP","LP"].forEach(p=>{
@@ -360,5 +375,4 @@ installBtn.onclick=async()=>{
 
 const isIos=()=>/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
 const isStandalone=()=>window.navigator.standalone;
-
 if(isIos()&&!isStandalone()) iosHint.style.display="block";
