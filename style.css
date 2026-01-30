@@ -60,8 +60,8 @@ select {
 /* ===== TOP CONTROLS ===== */
 #theme-selection {
   display: flex;
-  flex-direction: column; /* each label+dropdown on its own line */
-  gap: 12px; /* spacing between rows */
+  flex-direction: column;
+  gap: 12px;
 }
 
 #theme-selection label {
@@ -72,7 +72,7 @@ select {
 
 #theme-selection select {
   display: inline-block;
-  max-width: 150px; /* limits dropdown width */
+  max-width: 150px;
 }
 
 /* ===== CLEAR HAND ===== */
@@ -110,11 +110,11 @@ select {
 /* ===== DOMINO BOARD ===== */
 #domino-board {
   display: flex;
-  align-items: flex-end; /* align horizontal dominoes at bottom */
-  gap: 8px;              /* space between tiles */
-  overflow-x: auto;       /* scroll if chain too long */
+  align-items: flex-end; /* horizontal dominoes aligned bottom */
+  gap: 8px;
+  overflow-x: auto;
   padding: 10px;
-  height: 80px;           /* fixed height for board */
+  height: 80px;
   border: 1px solid #444;
   border-radius: 12px;
   background: rgba(255,255,255,0.05);
@@ -125,10 +125,9 @@ select {
   transition: transform 0.2s;
 }
 
-/* Rotate doubles vertically */
+/* doubles vertical */
 .board-domino.vertical {
   transform: rotate(90deg);
-  height: 60px; /* height stays the same */
 }
 
 /* ===== PLAYED SECTION ===== */
@@ -216,7 +215,6 @@ select {
     width: 54px;
   }
 
-  /* MOBILE FIX: Background / Domino Color */
   #theme-selection {
     display: grid;
     grid-template-columns: auto 1fr;
