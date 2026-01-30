@@ -8,20 +8,22 @@ body {
     Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   margin: 0;
   padding: 20px;
-  background: #1e1e1e;
-  color: #f5f5f5;
+  background: #1e1e1e; /* default dark */
+  color: #f5f5f5;      /* default light text for dark bg */
 }
 
 /* ===== HEADERS ===== */
 h1 {
   text-align: center;
   margin-bottom: 25px;
+  color: inherit; /* follow body color */
 }
 
 h2 {
   margin-top: 0;
   margin-bottom: 12px;
   font-size: 18px;
+  color: inherit;
 }
 
 /* ===== CARD CONTAINER ===== */
@@ -31,6 +33,7 @@ h2 {
   padding: 16px 18px;
   margin-bottom: 20px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  color: inherit;
 }
 
 /* ===== BUTTONS ===== */
@@ -41,7 +44,7 @@ button {
   padding: 6px 12px;
   font-size: 14px;
   background: #3b82f6;
-  color: white;
+  color: #fff;
 }
 
 button:hover {
@@ -60,8 +63,8 @@ select {
 /* ===== TOP CONTROLS ===== */
 #theme-selection {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: column; /* each label+dropdown on its own line */
+  gap: 12px; /* spacing between rows */
 }
 
 #theme-selection label {
@@ -72,7 +75,7 @@ select {
 
 #theme-selection select {
   display: inline-block;
-  max-width: 150px;
+  max-width: 150px; /* <-- limits dropdown width */
 }
 
 /* ===== CLEAR HAND ===== */
@@ -110,24 +113,15 @@ select {
 /* ===== DOMINO BOARD ===== */
 #domino-board {
   display: flex;
-  align-items: flex-end; /* horizontal dominoes aligned bottom */
-  gap: 8px;
-  overflow-x: auto;
+  align-items: center;
+  gap: 8px;           /* space between tiles */
+  overflow-x: auto;    /* scroll if long chain */
   padding: 10px;
-  height: 80px;
-  border: 1px solid #444;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.05);
 }
 
 .board-domino {
   height: 60px;
   transition: transform 0.2s;
-}
-
-/* doubles vertical */
-.board-domino.vertical {
-  transform: rotate(90deg);
 }
 
 /* ===== PLAYED SECTION ===== */
@@ -145,6 +139,7 @@ select {
   gap: 6px;
   margin: 6px 0;
   white-space: nowrap;
+  color: inherit;
 }
 
 #rp-tiles img,
@@ -174,13 +169,16 @@ select {
   gap: 50px;
   margin-bottom: 6px;
   white-space: nowrap;
+  color: inherit;
 }
 
+/* Played domino rotation in log */
 #played-log img {
   height: 46px;
   transform: rotate(-90deg);
 }
 
+/* Passes log */
 #passes-log img {
   width: 26px;
 }
@@ -188,6 +186,7 @@ select {
 /* ===== INSTALL BUTTON ===== */
 #install-btn {
   background: #22c55e;
+  color: #fff;
 }
 
 #install-btn:hover {
