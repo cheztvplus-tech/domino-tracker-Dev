@@ -15,7 +15,6 @@ let handIsSet = false;
 // Board chain (ordered tiles)
 let boardChain = [];
 
-
 // ================= ELEMENTS =================
 const handDropdownsDiv = document.getElementById("hand-dropdowns");
 const setHandBtn = document.getElementById("set-hand-btn");
@@ -39,12 +38,10 @@ const boardDiv = document.getElementById("domino-board");
 
 playerSelect.addEventListener("change", syncRotationWithSelect);
 
-
 // ================= FETCH SETS =================
 fetch("sets.json")
 .then(res => res.json())
 .then(data => {
-
   allDominoes = data.dominoes;
   themes = data.themes;
   defaultBackground = data.defaultBackground;
@@ -96,12 +93,11 @@ fetch("sets.json")
   initHandDropdowns();
 });
 
-
 // ================= THEMES =================
-bgSelect.addEventListener("change",e=>applyBackground(e.target.value));
+bgSelect.addEventListener("change", e => applyBackground(e.target.value));
 
-dominoSelect.addEventListener("change",e=>{
-  currentTileFolder=e.target.value;
+dominoSelect.addEventListener("change", e => {
+  currentTileFolder = e.target.value;
   renderMyHandButtons();
   updatePlayedLog();
   updatePassesLog();
@@ -113,14 +109,13 @@ function applyBackground(bg){
   document.body.style.background = themes[bg];
 }
 
-
 // ================= HAND SETUP =================
 function initHandDropdowns(){
   handDropdownsDiv.innerHTML="";
   for(let i=0;i<7;i++){
     const sel=document.createElement("select");
     sel.id=`hand-select-${i}`;
-    sel.addEventListener("change",updateHandDropdowns);
+    sel.addEventListener("change", updateHandDropdowns);
 
     const def=document.createElement("option");
     def.value="";
@@ -140,7 +135,7 @@ function initHandDropdowns(){
 }
 
 function updateHandDropdowns(){
-  const chosen=new Set();
+  const chosen = new Set();
   for(let i=0;i<7;i++){
     const v=document.getElementById(`hand-select-${i}`).value;
     if(v) chosen.add(v);
@@ -150,24 +145,22 @@ function updateHandDropdowns(){
     const sel=document.getElementById(`hand-select-${i}`);
     const current=sel.value;
     sel.innerHTML=`<option value="">Select Tile ${i+1}</option>`;
-
     allDominoes.forEach(t=>{
-      if(!chosen.has(t)||t===current){
+      if(!chosen.has(t) || t === current){
         const o=document.createElement("option");
         o.value=t;
         o.text=t;
-        if(t===current) o.selected=true;
+        if(t === current) o.selected = true;
         sel.appendChild(o);
       }
     });
   }
 }
 
-
 // ================= SET HAND =================
-setHandBtn.onclick=()=>{
-  myHand=[];
-  const seen=new Set();
+setHandBtn.onclick = () => {
+  myHand = [];
+  const seen = new Set();
 
   for(let i=0;i<7;i++){
     const v=document.getElementById(`hand-select-${i}`).value;
@@ -177,8 +170,8 @@ setHandBtn.onclick=()=>{
     myHand.push(v);
   }
 
-  handIsSet=true;
-  handSelectionDiv.style.display="none";
+  handIsSet = true;
+  handSelectionDiv.style.display = "none";
 
   renderMyHandButtons();
   refreshPlayedDropdown();
@@ -186,95 +179,107 @@ setHandBtn.onclick=()=>{
   syncRotationWithSelect();
 };
 
-
 // ================= CLEAR =================
-clearHandBtn.onclick=()=>{
-  myHand=[];
-  playedDominoes=[];
-  boardChain=[];
-  passes={RP:new Set(),MP:new Set(),LP:new Set()};
-  handIsSet=false;
+clearHandBtn.onclick = () => {
+  myHand = [];
+  playedDominoes = [];
+  boardChain = [];
+  passes = { RP:new Set(), MP:new Set(), LP:new Set() };
+  handIsSet = false;
 
-  handSelectionDiv.style.display="block";
+  handSelectionDiv.style.display = "block";
   initHandDropdowns();
-  myHandButtonsDiv.innerHTML="";
-  boardDiv.innerHTML="";
-  playedLogUl.innerHTML="";
-  passesLogUl.innerHTML="";
+  myHandButtonsDiv.innerHTML = "";
+  boardDiv.innerHTML = "";
+  playedLogUl.innerHTML = "";
+  passesLogUl.innerHTML = "";
 };
-
 
 // ================= MY HAND =================
 function renderMyHandButtons(){
-  myHandButtonsDiv.innerHTML="";
+  myHandButtonsDiv.innerHTML = "";
   myHand.forEach(t=>{
-    const b=document.createElement("button");
-    b.innerHTML=`<img src="${currentTileFolder}/${t.replace("|","-")}.png" width="50">`;
-    b.onclick=()=>playMyTile(t);
+    const b = document.createElement("button");
+    b.innerHTML = `<img src="${currentTileFolder}/${t.replace("|","-")}.png" width="50">`;
+    b.onclick = () => playMyTile(t);
     myHandButtonsDiv.appendChild(b);
   });
 }
 
 function playMyTile(tile){
-  playedDominoes.push({domino:tile,player:"ME"});
+  playedDominoes.push({domino:tile, player:"ME"});
   pushToBoard(tile);
-  myHand=myHand.filter(x=>x!==tile);
+  myHand = myHand.filter(x => x !== tile);
   renderMyHandButtons();
   refreshPlayedDropdown();
   updatePredictions();
   updatePlayedLog();
 }
 
-
 // ================= BOARD LOGIC =================
 function pushToBoard(tile){
-  const [a,b]=tile.split("|").map(Number);
-  boardChain.push({left:a,right:b});
+  const [a,b] = tile.split("|").map(Number);
+  boardChain.push({left:a, right:b});
   renderBoard();
 }
 
 function renderBoard(){
-  boardDiv.innerHTML="";
+  boardDiv.innerHTML = "";
+  let x = 0;
+  let y = 0;
+  let lastRight = null;
 
   boardChain.forEach(d=>{
-    const img=document.createElement("img");
-    img.src=`${currentTileFolder}/${d.left}-${d.right}.png`;
-    img.className="board-domino";
+    const img = document.createElement("img");
+    img.src = `${currentTileFolder}/${d.left}-${d.right}.png`;
+    img.className = "board-domino";
+    img.style.position = "absolute";
 
-    // ✅ ONLY doubles vertical
-    if(d.left===d.right){
-      img.style.transform="rotate(90deg)";
-    }else{
-      img.style.transform="rotate(0deg)";
+    if(d.left === d.right){ // doubles vertical
+      img.style.transform = "rotate(90deg)";
+      img.style.left = `${x}px`;
+      img.style.top = `${y}px`;
+      y += 40; // move down for next domino
+      lastRight = d.right;
+    } else { // horizontal
+      img.style.transform = "rotate(0deg)";
+      if(lastRight !== null && lastRight === d.left){
+        img.style.left = `${x}px`;
+        img.style.top = `${y}px`;
+      } else {
+        y += 10;
+        x += 50;
+        img.style.left = `${x}px`;
+        img.style.top = `${y}px`;
+      }
+      lastRight = d.right;
+      x += 50; // horizontal spacing
     }
 
     boardDiv.appendChild(img);
   });
 }
 
-
 // ================= PLAYED DROPDOWN =================
 function refreshPlayedDropdown(){
-  const used=new Set([...myHand,...playedDominoes.map(d=>d.domino)]);
-  playedDropdown.innerHTML="<option value=''>Select Tile</option>";
-
+  const used = new Set([...myHand, ...playedDominoes.map(d => d.domino)]);
+  playedDropdown.innerHTML = "<option value=''>Select Tile</option>";
   allDominoes.forEach(t=>{
     if(!used.has(t)){
-      const o=document.createElement("option");
-      o.value=t;
-      o.text=t;
+      const o = document.createElement("option");
+      o.value = t;
+      o.text = t;
       playedDropdown.appendChild(o);
     }
   });
 }
 
-
 // ================= OPPONENT PLAY =================
-addPlayBtn.onclick=()=>{
-  if(!playedDropdown.value){alert("Select tile");return;}
+addPlayBtn.onclick = () => {
+  if(!playedDropdown.value){ alert("Select tile"); return; }
 
-  const tile=playedDropdown.value;
-  playedDominoes.push({domino:tile,player:playerSelect.value});
+  const tile = playedDropdown.value;
+  playedDominoes.push({domino: tile, player: playerSelect.value});
   pushToBoard(tile);
 
   refreshPlayedDropdown();
@@ -283,126 +288,117 @@ addPlayBtn.onclick=()=>{
   nextTurn();
 };
 
-
 // ================= PASSES =================
-passBtn.onclick=()=>{
-  const p=playerSelect.value;
-  const nums=[];
+passBtn.onclick = () => {
+  const p = playerSelect.value;
+  const nums = [];
 
   if(passNumber1Select.value){
-    const n=+passNumber1Select.value;
+    const n = +passNumber1Select.value;
     passes[p].add(n);
     nums.push(n);
   }
   if(passNumber2Select.value){
-    const n=+passNumber2Select.value;
+    const n = +passNumber2Select.value;
     passes[p].add(n);
     nums.push(n);
   }
 
-  passesLogUl.dataset.log=passesLogUl.dataset.log||"[]";
-  const log=JSON.parse(passesLogUl.dataset.log);
-  log.push({player:p,nums});
-  passesLogUl.dataset.log=JSON.stringify(log);
+  passesLogUl.dataset.log = passesLogUl.dataset.log || "[]";
+  const log = JSON.parse(passesLogUl.dataset.log);
+  log.push({player:p, nums});
+  passesLogUl.dataset.log = JSON.stringify(log);
 
   updatePassesLog();
-  passNumber1Select.value="";
-  passNumber2Select.value="";
+  passNumber1Select.value = "";
+  passNumber2Select.value = "";
   updatePredictions();
   nextTurn();
 };
 
 function updatePassesLog(){
-  passesLogUl.innerHTML="";
-  const log=JSON.parse(passesLogUl.dataset.log||"[]");
-
+  passesLogUl.innerHTML = "";
+  const log = JSON.parse(passesLogUl.dataset.log || "[]");
   log.forEach((e,i)=>{
-    const li=document.createElement("li");
-    li.innerHTML=`${i+1}. ${e.player} passed ${e.nums.join(", ")}`;
+    const li = document.createElement("li");
+    li.innerHTML = `${i+1}. ${e.player} passed ${e.nums.join(", ")}`;
     passesLogUl.appendChild(li);
   });
 }
 
-
 // ================= PREDICTIONS =================
 function updatePredictions(){
   if(!handIsSet) return;
+  const used = new Set([...myHand, ...playedDominoes.map(d => d.domino)]);
+  let available = allDominoes.filter(t => !used.has(t));
 
-  const used=new Set([...myHand,...playedDominoes.map(d=>d.domino)]);
-  let available=allDominoes.filter(t=>!used.has(t));
-
-  const tilesLeft={RP:7,MP:7,LP:7};
+  const tilesLeft = {RP:7,MP:7,LP:7};
   playedDominoes.forEach(d=>{
-    if(d.player!=="ME") tilesLeft[d.player]--;
+    if(d.player !== "ME") tilesLeft[d.player]--;
   });
 
-  const pred={RP:[],MP:[],LP:[]};
-
+  const pred = {RP:[], MP:[], LP:[]};
   ["RP","MP","LP"].forEach(p=>{
-    let pool=[...available].sort(()=>Math.random()-0.5);
-    while(pred[p].length<tilesLeft[p]&&pool.length){
-      const t=pool.shift();
+    let pool = [...available].sort(()=>Math.random()-0.5);
+    while(pred[p].length < tilesLeft[p] && pool.length){
+      const t = pool.shift();
       pred[p].push(t);
-      available=available.filter(x=>x!==t);
+      available = available.filter(x => x!==t);
     }
   });
 
-  rpTilesSpan.innerHTML=pred.RP.map(img).join("");
-  mpTilesSpan.innerHTML=pred.MP.map(img).join("");
-  lpTilesSpan.innerHTML=pred.LP.map(img).join("");
+  rpTilesSpan.innerHTML = pred.RP.map(img).join("");
+  mpTilesSpan.innerHTML = pred.MP.map(img).join("");
+  lpTilesSpan.innerHTML = pred.LP.map(img).join("");
 }
 
-const img=t=>`<img src="${currentTileFolder}/${t.replace("|","-")}.png" width="40">`;
-
+const img = t => `<img src="${currentTileFolder}/${t.replace("|","-")}.png" width="40">`;
 
 // ================= PLAYED LOG =================
 function updatePlayedLog(){
-  playedLogUl.innerHTML="";
+  playedLogUl.innerHTML = "";
   playedDominoes.forEach((d,i)=>{
-    const li=document.createElement("li");
-    li.innerHTML=`${i+1}. ${d.player} <img src="${currentTileFolder}/${d.domino.replace("|","-")}.png" height="40">`;
+    const li = document.createElement("li");
+    li.innerHTML = `${i+1}. ${d.player} <img src="${currentTileFolder}/${d.domino.replace("|","-")}.png" height="40">`;
     playedLogUl.appendChild(li);
   });
 }
 
-
 // ================= ROTATION =================
 function syncRotationWithSelect(){
-  currentRotationIndex=playerRotation.indexOf(playerSelect.value);
+  currentRotationIndex = playerRotation.indexOf(playerSelect.value);
 }
 function nextTurn(){
-  currentRotationIndex=(currentRotationIndex+1)%3;
-  playerSelect.value=playerRotation[currentRotationIndex];
+  currentRotationIndex = (currentRotationIndex+1) % 3;
+  playerSelect.value = playerRotation[currentRotationIndex];
 }
-
 
 // ================= SERVICE WORKER =================
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("service-worker.js");
 }
 
-
 // ================= INSTALL =================
 let deferredPrompt;
-const installBtn=document.getElementById("install-btn");
-const iosHint=document.getElementById("ios-hint");
+const installBtn = document.getElementById("install-btn");
+const iosHint = document.getElementById("ios-hint");
 
-window.addEventListener("beforeinstallprompt",e=>{
+window.addEventListener("beforeinstallprompt", e=>{
   e.preventDefault();
-  deferredPrompt=e;
-  installBtn.style.display="inline-block";
+  deferredPrompt = e;
+  installBtn.style.display = "inline-block";
 });
 
-installBtn.onclick=async()=>{
+installBtn.onclick = async () => {
   if(deferredPrompt){
     deferredPrompt.prompt();
     await deferredPrompt.userChoice;
-    deferredPrompt=null;
-    installBtn.style.display="none";
+    deferredPrompt = null;
+    installBtn.style.display = "none";
   }
 };
 
-const isIos=()=>/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-const isStandalone=()=>window.navigator.standalone;
+const isIos = () => /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+const isStandalone = () => window.navigator.standalone;
 
-if(isIos()&&!isStandalone()) iosHint.style.display="block";
+if(isIos() && !isStandalone()) iosHint.style.display = "block";
