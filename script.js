@@ -9,6 +9,7 @@ let passes = { RP:new Set(), MP:new Set(), LP:new Set() };
 const playerRotation = ["RP","MP","LP"];
 let currentRotationIndex = 0;
 let handIsSet = false;
+let boardChain = [];
 
 // ======= Elements =======
 const handDropdownsDiv = document.getElementById('hand-dropdowns');
@@ -214,6 +215,19 @@ function playMyTile(t){
   updatePlayedLog();
 }
 
+// ======= Rendered Function =======
+function renderBoard() {
+  const board = document.getElementById("domino-board");
+  board.innerHTML = "";
+
+  boardChain.forEach(d => {
+    const img = document.createElement("img");
+    img.src = `dominoes/${d.left}_${d.right}.png`;
+    img.className = "board-domino";
+    board.appendChild(img);
+  });
+}
+
 // ======= Played Dropdown =======
 function refreshPlayedDropdown(){
   const used=new Set([...myHand,...playedDominoes.map(d=>d.domino)]);
@@ -371,3 +385,4 @@ const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCa
 const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
 if(isIos() && !isInStandaloneMode()) iosHint.style.display = 'block';
+
