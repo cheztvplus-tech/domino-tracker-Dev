@@ -55,6 +55,7 @@ fetch("sets.json")
   });
 
   bgSelect.value = defaultBackground;
+  applyBackground(defaultBackground);
 
   [
     "tiles-white b",
@@ -93,15 +94,20 @@ fetch("sets.json")
 });
 
 // ================= THEMES =================
-bgSelect.addEventListener("change",e=>{});
-dominoSelect.addEventListener("change",e=>{
-  currentTileFolder=e.target.value;
+bgSelect.addEventListener("change", e => applyBackground(e.target.value));
+
+dominoSelect.addEventListener("change", e=>{
+  currentTileFolder = e.target.value;
   renderMyHandButtons();
   updatePlayedLog();
   updatePassesLog();
   renderBoard();
   if(handIsSet) updatePredictions();
 });
+
+function applyBackground(bg){
+  document.body.style.background = themes[bg];
+}
 
 // ================= HAND SETUP =================
 function initHandDropdowns(){
@@ -156,7 +162,6 @@ function updateHandDropdowns(){
 setHandBtn.onclick=()=>{
   myHand=[];
   const seen=new Set();
-
   for(let i=0;i<7;i++){
     const v=document.getElementById(`hand-select-${i}`).value;
     if(!v){ alert("Select all 7 tiles"); return; }
@@ -225,11 +230,15 @@ function renderBoard(){
     img.src=`${currentTileFolder}/${d.left}-${d.right}.png`;
     img.className="board-domino";
 
-    // Only doubles vertical
-    if(d.left===d.right){
-      img.style.transform="rotate(90deg)";
-    }else{
-      img.style.transform="rotate(0deg)";
+    // ✅ ONLY doubles vertical (tall), all others horizontal
+    if(d.left === d.right){
+      img.style.transform="rotate(0deg)";   // vertical image is default orientation
+      img.style.width="30px";
+      img.style.height="60px";
+    } else {
+      img.style.transform="rotate(0deg)";   // horizontal
+      img.style.width="60px";
+      img.style.height="30px";
     }
 
     boardDiv.appendChild(img);
@@ -253,10 +262,12 @@ function refreshPlayedDropdown(){
 
 // ================= OPPONENT PLAY =================
 addPlayBtn.onclick=()=>{
-  if(!playedDropdown.value){alert("Select tile");return;}
+  if(!playedDropdown.value){alert("Select tile"); return;}
+
   const tile=playedDropdown.value;
   playedDominoes.push({domino:tile,player:playerSelect.value});
   pushToBoard(tile);
+
   refreshPlayedDropdown();
   updatePredictions();
   updatePlayedLog();
@@ -294,6 +305,7 @@ passBtn.onclick=()=>{
 function updatePassesLog(){
   passesLogUl.innerHTML="";
   const log=JSON.parse(passesLogUl.dataset.log||"[]");
+
   log.forEach((e,i)=>{
     const li=document.createElement("li");
     li.innerHTML=`${i+1}. ${e.player} passed ${e.nums.join(", ")}`;
@@ -304,6 +316,7 @@ function updatePassesLog(){
 // ================= PREDICTIONS =================
 function updatePredictions(){
   if(!handIsSet) return;
+
   const used=new Set([...myHand,...playedDominoes.map(d=>d.domino)]);
   let available=allDominoes.filter(t=>!used.has(t));
 
@@ -313,6 +326,7 @@ function updatePredictions(){
   });
 
   const pred={RP:[],MP:[],LP:[]};
+
   ["RP","MP","LP"].forEach(p=>{
     let pool=[...available].sort(()=>Math.random()-0.5);
     while(pred[p].length<tilesLeft[p]&&pool.length){
@@ -375,4 +389,5 @@ installBtn.onclick=async()=>{
 
 const isIos=()=>/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
 const isStandalone=()=>window.navigator.standalone;
+
 if(isIos()&&!isStandalone()) iosHint.style.display="block";
